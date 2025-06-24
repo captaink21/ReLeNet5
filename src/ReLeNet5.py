@@ -21,34 +21,40 @@ class LeNet5(torch.nn.Module):
         self.use_batch_norm = use_batch_norm
 
         act_fn = torch.nn.Tanh() if activation == 'tanh' else torch.nn.ReLU()
-        pool = torch.nn.AvgPool2d(2, 2) if pooling == 'avg' else torch.nn.MaxPool2d(2, 2)
+        pool = torch.nn.AvgPool2d(
+            2, 2) if pooling == 'avg' else torch.nn.MaxPool2d(2, 2)
 
         if conv_size == 5:
-            self.conv1=torch.nn.Conv2d(1, 6, kernel_size=conv_size, padding=2)
+            self.conv1 = torch.nn.Conv2d(
+                1, 6, kernel_size=conv_size, padding=2)
         elif conv_size == 3:
-            self.conv1_1 = torch.nn.Conv2d(1, 6, kernel_size=conv_size, padding=1)
-            self.conv1_2 = torch.nn.Conv2d(6, 6, kernel_size=conv_size, padding=1)
+            self.conv1_1 = torch.nn.Conv2d(
+                1, 6, kernel_size=conv_size, padding=1)
+            self.conv1_2 = torch.nn.Conv2d(
+                6, 6, kernel_size=conv_size, padding=1)
 
-        self.bn1= torch.nn.BatchNorm2d(6) 
-        self.act1=act_fn
-        self.pool1=pool
+        self.bn1 = torch.nn.BatchNorm2d(6)
+        self.act1 = act_fn
+        self.pool1 = pool
 
         if conv_size == 5:
-            self.conv2=torch.nn.Conv2d(6, 16, kernel_size=conv_size, padding=0)
+            self.conv2 = torch.nn.Conv2d(
+                6, 16, kernel_size=conv_size, padding=0)
         elif conv_size == 3:
-            self.conv2_1 = torch.nn.Conv2d(6, 16, kernel_size=conv_size, padding=0)
-            self.conv2_2 = torch.nn.Conv2d(16, 16, kernel_size=conv_size, padding=0)
+            self.conv2_1 = torch.nn.Conv2d(
+                6, 16, kernel_size=conv_size, padding=0)
+            self.conv2_2 = torch.nn.Conv2d(
+                16, 16, kernel_size=conv_size, padding=0)
 
-        self.bn2= torch.nn.BatchNorm2d(16) 
-        self.act2=act_fn
-        self.pool2=pool
+        self.bn2 = torch.nn.BatchNorm2d(16)
+        self.act2 = act_fn
+        self.pool2 = pool
 
-        self.fc3=torch.nn.Linear(5*5*16, 120)
-        self.act3=act_fn
-        self.fc4=torch.nn.Linear(120, 84)
-        self.act4=act_fn
-        self.fc5=torch.nn.Linear(84, 10)
-
+        self.fc3 = torch.nn.Linear(5*5*16, 120)
+        self.act3 = act_fn
+        self.fc4 = torch.nn.Linear(120, 84)
+        self.act4 = act_fn
+        self.fc5 = torch.nn.Linear(84, 10)
 
     def forward(self, x):
 
@@ -88,11 +94,13 @@ class LeNet5(torch.nn.Module):
 
 
 def train_and_evaluate(system_name, X_train, y_train, X_test, y_test,
-                        activation='tanh', pooling='avg', conv_size=5, use_batch_norm=False,
-                        num_epochs=50, batch_size=100):
-    print(f"\n--- Обучение для {system_name.replace('_', ' ').title()} | activation={activation} pooling={pooling} conv={conv_size} bn={use_batch_norm} ---")
+                       activation='tanh', pooling='avg', conv_size=5, use_batch_norm=False,
+                       num_epochs=50, batch_size=100):
+    print(
+        f"\n--- Обучение для {system_name.replace('_', ' ').title()} | activation={activation} pooling={pooling} conv={conv_size} bn={use_batch_norm} ---")
 
-    model = LeNet5(activation=activation, pooling=pooling, conv_size=conv_size, use_batch_norm=use_batch_norm)
+    model = LeNet5(activation=activation, pooling=pooling,
+                   conv_size=conv_size, use_batch_norm=use_batch_norm)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -120,14 +128,17 @@ def train_and_evaluate(system_name, X_train, y_train, X_test, y_test,
         with torch.no_grad():
             val_output = model(X_test.to(device))
             val_loss = loss_fn(val_output, y_test.to(device)).item()
-            val_acc = (val_output.argmax(1) == y_test.to(device)).float().mean().item()
+            val_acc = (val_output.argmax(1) == y_test.to(
+                device)).float().mean().item()
 
         acc_hist.append(val_acc)
         loss_hist.append(val_loss)
 
-        print(f" Эпоха {epoch + 1}/{num_epochs}: Точность={val_acc:.4f} Потери={val_loss:.4f}")
+        print(
+            f" Эпоха {epoch + 1}/{num_epochs}: Точность={val_acc:.4f} Потери={val_loss:.4f}")
 
     return acc_hist, loss_hist
+
 
 if __name__ == "__main__":
     dataset_path = "digit_dataset"
@@ -137,19 +148,27 @@ if __name__ == "__main__":
     os.makedirs(plots_dir, exist_ok=True)
 
     configs = [
-        {"activation": "tanh", "pooling": "avg", "conv_size": 5, "use_batch_norm": False},
-        {"activation": "relu", "pooling": "avg", "conv_size": 5, "use_batch_norm": False},
-        {"activation": "relu", "pooling": "max", "conv_size": 3, "use_batch_norm": False},
-        {"activation": "relu", "pooling": "max", "conv_size": 3, "use_batch_norm": True}
+        {"activation": "tanh", "pooling": "avg",
+            "conv_size": 5, "use_batch_norm": False},
+        {"activation": "relu", "pooling": "avg",
+            "conv_size": 5, "use_batch_norm": False},
+        {"activation": "relu", "pooling": "max",
+            "conv_size": 3, "use_batch_norm": False},
+        {"activation": "relu", "pooling": "max",
+            "conv_size": 3, "use_batch_norm": True}
     ]
 
     results = {}
     for system in systems:
         try:
-            X_train = torch.load(os.path.join(dataset_path, f"{system}_X_train.pt"))
-            y_train = torch.load(os.path.join(dataset_path, f"{system}_y_train.pt"))
-            X_test = torch.load(os.path.join(dataset_path, f"{system}_X_test.pt"))
-            y_test = torch.load(os.path.join(dataset_path, f"{system}_y_test.pt"))
+            X_train = torch.load(os.path.join(
+                dataset_path, f"{system}_X_train.pt"))
+            y_train = torch.load(os.path.join(
+                dataset_path, f"{system}_y_train.pt"))
+            X_test = torch.load(os.path.join(
+                dataset_path, f"{system}_X_test.pt"))
+            y_test = torch.load(os.path.join(
+                dataset_path, f"{system}_y_test.pt"))
 
             for cfg in configs:
                 if int(cfg['use_batch_norm']):
@@ -173,7 +192,6 @@ if __name__ == "__main__":
 
         except FileNotFoundError:
             print(f"⚠️ Файлы для системы {system} не найдены.")
-
 
     for system in systems:
         plt.figure()
@@ -211,7 +229,8 @@ if __name__ == "__main__":
                 val["batch_norm"] == cfg["use_batch_norm"]
             ):
                 has_data = True
-                plt.plot(range(1, num_epochs + 1), val["accuracy"], label=val["system"])
+                plt.plot(range(1, num_epochs + 1),
+                         val["accuracy"], label=val["system"])
 
         if has_data:
             title = f"Accuracy — act={cfg['activation']}, pool={cfg['pooling']}, conv={cfg['conv_size']}, bn={cfg['use_batch_norm']}"
@@ -225,8 +244,6 @@ if __name__ == "__main__":
             plt.savefig(os.path.join(plots_dir, filename))
             plt.close()
 
-
-
     for cfg in configs:
         plt.figure()
         has_data = False
@@ -238,7 +255,8 @@ if __name__ == "__main__":
                 val["batch_norm"] == cfg["use_batch_norm"]
             ):
                 has_data = True
-                plt.plot(range(1, num_epochs + 1), val["loss"], label=val["system"])
+                plt.plot(range(1, num_epochs + 1),
+                         val["loss"], label=val["system"])
 
         if has_data:
             title = f"Loss — act={cfg['activation']}, pool={cfg['pooling']}, conv={cfg['conv_size']}, bn={cfg['use_batch_norm']}"
@@ -271,8 +289,6 @@ if __name__ == "__main__":
     df.to_excel("results_summary.xlsx", index=False)
     print("✅ Сводная таблица сохранена в results_summary.csv и .xlsx")
 
-
     with open("results_raw.pkl", "wb") as f:
         pickle.dump(results, f)
     print("✅ Полные результаты сохранены в results_raw.pkl")
-cd 
